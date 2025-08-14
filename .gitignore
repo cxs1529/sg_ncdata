@@ -1,0 +1,6 @@
+# ignore virtual environment
+.venv-nc/
+# ignore old codes
+previous/
+# ignore databases
+*.db
