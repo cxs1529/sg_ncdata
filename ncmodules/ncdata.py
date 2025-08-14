@@ -77,13 +77,13 @@ def process_netcdf(ncfile):
         log_gps_time_utc.append(dt_str)
         
     # derived dive time
-    deltaT = log_gps_time[-1] - log_gps_time[-2] # time between last 2 gps fixes. Take into account time for maneuvers
+    glider_dive_time = log_gps_time[-1] - log_gps_time[-2] # time between last 2 gps fixes. Take into account time for maneuvers
     total_flight_time_s = ncdata.variables["total_flight_time_s"][:].tolist()
     # log_gps_lat and log_gps_lon are lists with [GPS1 GPS2 GPS] >> 1st-fix 2nd-fix --dive-- fix-post-dive > determine DOG with GPS2 and GPS
     displacement = haversine(float(log_gps_lat[1]), float(log_gps_lon[1]), float(log_gps_lat[2]), float(log_gps_lon[2])) # distance over ground [km] and bearing [deg]
-    dog = displacement["distance"]
-    hdg = displacement["heading"]
-    sog = dog * 1000 /deltaT # speed over ground [m/s]
+    glider_dog = displacement["distance"]
+    glider_hdg = displacement["heading"]
+    glider_sog = glider_dog * 1000 /glider_dive_time # speed over ground [m/s]
     # sea currents
     depth_avg_curr_east = ncdata.variables["depth_avg_curr_east"][:].tolist() # in m/s
     depth_avg_curr_north = ncdata.variables["depth_avg_curr_north"][:].tolist()
@@ -168,7 +168,11 @@ def process_netcdf(ncfile):
     "dac_velocity" : dac_velocity,
     "dac_heading" : dac_heading,
     "surf_velocity" : surf_velocity,
-    "surf_heading" : surf_heading
+    "surf_heading" : surf_heading,
+    "glider_sog" : glider_sog,
+    "glider_dog" : glider_dog,
+    "glider_hdg" : glider_hdg,
+    "glider_dive_time" : glider_dive_time
     }
     #print(thisdive)
 

@@ -1,5 +1,7 @@
 import os
 import sqlite3 as sql
+from ncmodules import ncdata
+import pandas as pd
 
 # dirpath = "C:\\Users\\christian.saiz\\Documents\\0_NOAA\\1_NOAA_work\\2_GLIDERS\\2025\\piloting\\668"
 
@@ -89,3 +91,41 @@ def get_files2process(ncfile_list, dbname, logtable):
         print(f">> {dbname} database NOT found!")
         return ncfile_list
 
+
+def process_directory(ncfile_list, dbname, logtable):
+    if len(ncfile_list) > 0:
+        # start empty dataframe
+        df = pd.DataFrame()
+        # loop through nc files and process each
+        idx = 0
+        for ncfile in ncfile_list:   
+            # get dictionary from ncfile     
+            thisdive_dict = ncdata.process_netcdf(ncfile)
+            #ncdata.print_dictionary(thisdive_dict)
+            # create dataframe from dictonary
+            thisdive_df = pd.DataFrame(thisdive_dict, index = [idx])
+            # add column with filepath
+            thisdive_df["filePath"] = ncfile
+            # append to main dataframe 
+            df = pd.concat([df, thisdive_df])
+            idx = idx + 1
+
+        # Store values in database
+        conn = sql.connect(dbname)
+        rows = df.to_sql(logtable, conn, if_exists='append', index=False)
+        conn.close()
+
+        return rows
+
+# returns database table as dataframe ordered in ascending or descending order by dive number
+def read_database(dbname, logtable, order):
+    print("=====================")
+    print(f">> Displaying {dbname} values:\n")
+    conn = sql.connect(dbname) 
+    if order == "descending":
+        df_read = pd.read_sql_query(f"SELECT * FROM {logtable} ORDER BY dive DESC;", conn)
+    else:
+        df_read = pd.read_sql_query(f"SELECT * FROM {logtable} ORDER BY dive ASC;", conn)
+    conn.close()    
+
+    return df_read
