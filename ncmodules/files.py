@@ -7,7 +7,7 @@ import pandas as pd
 
 # test only N files
 test = True # False: process all .nc in dir / True: process only first nfiles
-nfiles = 25 # no. of .nc files to process
+nfiles = 10 # no. of .nc files to process
 
 def list_ncdir(dir, sgid):
     print("=====================")

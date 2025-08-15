@@ -9,6 +9,8 @@ SM_depth_thd = {"min":0.5, "max": 1.5}
 CALLS_thd = {"min":0, "max": 5}
 dac_velocity_thd = {"min":0, "max": 1}
 surf_velocity_thd = {"min":0, "max": 71} 
+vbd_rate_apogee_thd = {"min": 3.9, "max": 4.7} 
+vbd_imax_thd = {"min": 1000, "max": 2500} 
 
 
 # returns a formated html table based on a dataframe
@@ -21,12 +23,15 @@ def convert_to_table(df):
        'TGT_lon', 'int_Humidity', 'int_Pressure', 'int_Temperature', 'SM_CC',
        'SM_angle', 'SM_depth', 'CALLS', 'ERRORS', 'dac_velocity',
        'dac_heading', 'surf_velocity', 'surf_heading', 'glider_sog',
-       'glider_dog', 'glider_hdg', 'glider_dive_time' ] # 'filePath' removed
+       'glider_dog', 'glider_hdg', 'glider_dive_time', 
+       'roll_imax', 'pitch_imax', 'vbd_imax', 'roll_rate_min', 'pitch_rate_min',
+       'vbd_rate_min', 'vbd_i_apogee', 'vbd_rate_apogee', 'depth_reached', 
+        "log_AH_total_capacity", "log_AH_total_consumed", "log_24_minv", "log_10_minv", "log_energy_thisdive" ] # 'filePath' removed
     
     #print(df.keys())  # prints all dataframe keys or headers
 
     # build header html string
-    print(">html for header:")  
+    #print(">html for header:")  
     html_table_headers = "<tr class=\"table_header\">\n"
     for j in df.keys():
         if j in filter_headers:
@@ -34,10 +39,10 @@ def convert_to_table(df):
             html_table_headers = html_table_headers + f"\n\t<th class=\"table_header\"> {j} {units} </th>" 
 
     html_table_headers = html_table_headers + "\n</tr>\n"
-    print(html_table_headers)
+    #print(html_table_headers)
 
     # create html table string assuming diveN is in descending order
-    print(">html for data:")  
+    #print(">html for data:")  
     html_table_data = ""    
     for i in range(0, len(df)):
         # start table row
@@ -49,7 +54,7 @@ def convert_to_table(df):
             html_table_data = html_table_data + f"\t<td class={data_class}> {data_value} </td>\n"
         # end table row
         html_table_data = html_table_data + "</tr>\n"
-    print(html_table_data)
+    #print(html_table_data)
 
     return html_table_headers + html_table_data
 
@@ -68,6 +73,8 @@ def get_data_class(i, col, df):
     gps_locations = ['gps_lat_start', 'gps_lon_start', 'gps_lat_end', 'gps_lon_end']
     velocities = ['dac_velocity',  'surf_velocity', 'glider_dog' ]
     headings = ['dac_heading', 'surf_heading', 'glider_hdg']
+    ecurrents = ["roll_imax", "pitch_imax", "vbd_imax"]
+    adrates = ["roll_rate_min", "pitch_rate_min", "vbd_rate_min"]
 
     # set style class based on parameter value exceeding normal values
     if col == "int_Humidity":
@@ -122,12 +129,29 @@ def get_data_class(i, col, df):
         data_value = int(round(data_value, 0))
     elif col == "glider_dive_time":
         data_value = str(int(data_value)) + " | " + str(int(data_value/60.0)) + " | " + str(round(data_value/60.0/60.0, 1))
+    elif col == "depth_reached":
+        data_value = int(round(data_value, 0))
+    elif col in ecurrents:
+        data_value = int(round(data_value, 0))
+    elif col in adrates:
+        data_value = f"{round(data_value, 1):.1f}"
+    elif col == "vbd_rate_apogee":
+        if data_value <= vbd_rate_apogee_thd["min"] or data_value >= vbd_rate_apogee_thd["max"]:
+            data_class = "data_warning" 
+        data_value = f"{round(data_value, 2):.2f}"
+    elif col == "vbd_i_apogee":
+        if data_value <= vbd_imax_thd["min"] or data_value >= vbd_imax_thd["max"]:
+            data_class = "data_warning" 
+        data_value = int(round(data_value, 0))
+    # insert here a new elif for new columns
     else:
         pass
     
 
     return data_value, data_class
 
+
+# based on the parameter assign units to show in header
 def get_header_units(j):
     units = ""
 
@@ -153,6 +177,13 @@ def get_header_units(j):
        units = "[km]"
     elif j == "glider_sog":
         units = "[m/s][km/h]"
+    elif j in ["roll_imax", "pitch_imax", "vbd_imax", "vbd_i_apogee"]:
+        units = "[mA]"
+    elif j in ["roll_rate_min", "pitch_rate_min", "vbd_rate_min", "vbd_rate_apogee"]:
+        units = "[AD/s]"
+    elif j == "depth_reached":
+       units = "[m]"
+    # add an elif for new columns
     else:
         pass
     

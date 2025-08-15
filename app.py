@@ -25,6 +25,13 @@ def table(sgid):
     return render_template("table.html", table_data=table_data, sgid=sgid)
 
 
+@app.route("/map_<sgid>")
+def map(sgid):
+    map_data = {}
+    
+    return render_template("table.html", map_data = map_data, sgid=sgid)
+
+
 
 @app.route("/dftable")
 def df_table(sgid="668"):
