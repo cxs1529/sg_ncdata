@@ -38,7 +38,7 @@ def print_dictionary(dict):
     for var in dict:
         print(var, ":", dict[var])
 
-# Returns distance over ground and bearing between 2 gps positions as dd.ddd
+# Returns distance over ground  in km and bearing between 2 gps positions as dd.ddd
 def haversine(lat1,lon1,lat2,lon2):
     # distance between 2 positions
     lat1, lon1, lat2, lon2 = map(np.radians, [float(lat1), float(lon1), float(lat2), float(lon2)])    
@@ -110,8 +110,13 @@ def process_netcdf(ncfile):
     log_TGT_NAME = "".join(log_TGT_NAME)
     log_TGT_LATLONG = np.char.decode(ncdata.variables["log_TGT_LATLONG"], encoding='utf-8')
     log_TGT_LATLONG = "".join(log_TGT_LATLONG)
-    log_TGT_LAT = log_TGT_LATLONG.split(",")[0]
-    log_TGT_LON = log_TGT_LATLONG.split(",")[1]
+    log_TGT_LAT = float(log_TGT_LATLONG.split(",")[0])
+    log_TGT_LON = float(log_TGT_LATLONG.split(",")[1])
+    # convert ddmm.mmm to dd.ddd
+    tgt_coord = coordinate_conversion(log_TGT_LAT, log_TGT_LON)
+    log_TGT_LAT = tgt_coord['lat']
+    log_TGT_LON = tgt_coord['lon']
+
     # GC control
     log_C_PITCH = ncdata.variables["log_C_PITCH"][:].tolist()
     log_PITCH_GAIN = ncdata.variables["log_PITCH_GAIN"][:].tolist()
@@ -305,7 +310,17 @@ def get_rate(ad_start, ad_end, time):
         rates.append(rate)
     return rates
 
-# Entry point main ------------------------------------------------------------
-# if __name__ == "__main__":
-#     main()
 
+
+# convert 'targets' file ddmm.mmm coordinates to dd.ddd
+def coordinate_conversion(lat,lon):
+    lat = int(lat/100.0) + (lat % 100)/60.0 
+      
+    if lon < 0:        
+        lon = int(lon/100.0) - (abs(lon) % 100)/60.0
+    else:
+        lon = int(lon/100.0) + (abs(lon) % 100)/60.0
+    
+    dec_coord = {'lat':lat, 'lon':lon}
+
+    return dec_coord

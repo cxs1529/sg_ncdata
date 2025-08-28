@@ -58,3 +58,10 @@
     background-color: lightslategray;
 }
 
+p {
+    background-color:grey;
+    text-align: center;
+    font-weight: bold;
+    padding: 2px;
+    width: 100%;
+}

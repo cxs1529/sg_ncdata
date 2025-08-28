@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block title %} SG{{ sgid }} Map {% endblock %}
+
+{% block content %}
+
+<p> Values for sg{sgid} map... </p>
+<iframe src={{map_url}} width="800" height="600" frameborder="0"></iframe>
+
+{% endblock %}

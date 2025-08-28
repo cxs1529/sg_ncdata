@@ -24,8 +24,10 @@ def main():
 
     # read values from database
     df = files.read_database(dbname, logtable, "descending")
+    pd.set_option('display.max_columns', None)
     print(df)
 
+    print("Dataframe keys:")
     print(df.keys())
 
     # df_html.convert_to_table(df)
