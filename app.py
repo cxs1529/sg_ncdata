@@ -59,11 +59,15 @@ def stats(sgid=sgid_list[0]): # use first in list if none selected
         df = files.read_database(dbname, logtable, "descending") # query db in descending dive num order to have last dive first    
         # table_data = df_html.convert_to_table(df) # Returns html string for table. use |safe keyword in html template so jinja doesn't change characters in strings
         dashvalues = logstats.glider_stats(df) # function to return stats information and plots 
-        html_dashboard = logstats.dashboard_html(dashvalues)
-    else:
-        html_dashboard = "<div> Glider ID not processed </div>"
+        # html_dash = logstats.dashboard_html(dashvalues)
+        navigation_dash = logstats.get_navigation_html(dashvalues)
+        call_dash = logstats.get_call_html(dashvalues)
 
-    return render_template("glider_template.html", sgid=sgid, html_dashboard=html_dashboard, homeFlag=False)
+    else:
+        navigation_dash = "<div> Glider ID not processed </div>"
+        call_dash = "<div> Glider ID not processed </div>" 
+
+    return render_template("glider_template.html", sgid=sgid, navigation_dash=navigation_dash, call_dash=call_dash, homeFlag=False)
 
 
 

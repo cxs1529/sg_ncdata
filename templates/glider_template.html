@@ -9,8 +9,10 @@
 <link rel="stylesheet" href="{{url_for('static', filename='/css/gliderdash_styles.css')}}" />
 
 <h1> SG{{sgid}} home stats page </h1>
-
-{{ html_dashboard|safe }}
-
+<br>
+<h2>NAVIGATION</h2>
+{{ navigation_dash|safe }}
+<h2>CALL</h2>
+{{ call_dash|safe }}
 
 {% endblock %}

@@ -1,16 +1,17 @@
 import pandas as pd
+from .thresholds import *
 
-# define warning threshold values for conditional formatting
-int_Humidity_thd = {"min":40.0, "max": 70.0}
-int_Pressure_thd = {"min":9.2, "max": 10.0}
-int_Temperature_thd = {"min":15, "max": 35}
-SM_angle_thd = {"min":-75, "max": -50}
-SM_depth_thd = {"min":0.5, "max": 1.5}
-CALLS_thd = {"min":0, "max": 5}
-dac_velocity_thd = {"min":0, "max": 1}
-surf_velocity_thd = {"min":0, "max": 71} 
-vbd_rate_apogee_thd = {"min": 3.9, "max": 4.7} 
-vbd_imax_thd = {"min": 1000, "max": 2500} 
+# # define warning threshold values for conditional formatting
+# int_Humidity_thd = {"min":40.0, "max": 70.0}
+# int_Pressure_thd = {"min":9.2, "max": 10.0}
+# int_Temperature_thd = {"min":15, "max": 35}
+# SM_angle_thd = {"min":-75, "max": -50}
+# SM_depth_thd = {"min":0.5, "max": 1.5}
+# CALLS_thd = {"min":0, "max": 5}
+# dac_velocity_thd = {"min":0, "max": 1}
+# surf_velocity_thd = {"min":0, "max": 71} 
+# vbd_rate_apogee_thd = {"min": 3.9, "max": 4.7} 
+# vbd_imax_thd = {"min": 1000, "max": 2500} 
 
 
 # returns a formated html table based on a dataframe
@@ -64,7 +65,8 @@ def get_data_class(i, col, df):
     # default values to return
     data_class = "data_normal"
     data_value = df.loc[i,col]
-    # parameter classification for styling
+
+    # parameter group classification for styling
     ctrl_parameters_int = ['D_TGT', 'D_ABORT', 'T_DIVE', 'T_MISSION',
        'T_ABORT', 'C_PITCH', 'C_ROLL_DIVE', 'C_ROLL_CLIMB',
        'C_VBD', 'MAX_BUOY', 'NAV_MODE', 'HEADING', 'SM_CC']
@@ -143,6 +145,18 @@ def get_data_class(i, col, df):
         if data_value <= vbd_imax_thd["min"] or data_value >= vbd_imax_thd["max"]:
             data_class = "data_warning" 
         data_value = int(round(data_value, 0))
+    elif col == "roll_imax":
+        if data_value <= roll_imax_thd["min"] or data_value >= roll_imax_thd["max"]:
+            data_class = "data_warning" 
+        data_value = int(round(data_value, 0))   
+    elif col == "pitch_imax":
+        if data_value <= pitch_imax_thd["min"] or data_value >= pitch_imax_thd["max"]:
+            data_class = "data_warning" 
+        data_value = int(round(data_value, 0)) 
+    elif col == "vbd_imax":
+        if data_value <= vbd_imax_thd["min"] or data_value >= vbd_imax_thd["max"]:
+            data_class = "data_warning" 
+        data_value = int(round(data_value, 0))   
     # insert here a new elif for new columns
     else:
         pass
